@@ -14,6 +14,10 @@ app.post('/echo', function(req, res){
   req.pipe(res);
 });
 
+app.post('/dev/null', function(req, res){
+  res.status(204).end();
+});
+
 var base = 'http://localhost'
 var server;
 before(function listen(done) {
@@ -188,6 +192,16 @@ describe('Request', function(){
           })
           .end(function (err, res) {
             done(new Error("Request should have been aborted earlier!"))
+          })
+    })
+    it('should work even when server does not consumes all of request body', function(done){
+      request
+          .post(base + '/dev/null')
+          .attach('document', 'test/node/fixtures/user.html', 'doc.html')
+          .end(function(err, res){
+            if (err) return done(err);
+            res.statusCode.should.equal(204);
+            done();
           })
     })
   })
